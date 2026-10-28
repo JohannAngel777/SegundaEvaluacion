@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Spinner} from 'reactstrap';
+import { Row, Col, Spinner, Button, Alert } from 'reactstrap';
 import TopPanel from '../components/TopPanel.jsx';
 import MenuGrid from '../components/MenuGrid.jsx';
 import Cart from '../components/Cart.jsx';
 import Countdown from '../components/Countdown.jsx';
 import ErrorAlert from '../components/ErrorAlert.jsx';
-import { obtenerMenu, obtenerReserva, agregarAReserva } from '../services/api.js';
+import { obtenerMenu, obtenerReserva, agregarAReserva, confirmarReserva } from '../services/api.js';
 
 
 const RESERVA_INICIAL = {
@@ -22,6 +22,7 @@ function FoodDei() {
   const [reserva, setReserva] = useState(RESERVA_INICIAL); // objeto con saldo, items, total, estado
   const [error, setError] = useState(null); // null o { id, texto }
   const [cargando, setCargando] = useState(true); // true mientras se espera al backend
+  const [confirmacion, setConfirmacion] = useState(''); // mensaje cuando se confirma la reserva
  
   // Guarda el error con un id nuevo para que ErrorAlert lo muestre otra vez
   // Cart y Countdown reciben esta función como onError y le pasan error.message
@@ -52,6 +53,7 @@ function FoodDei() {
   // Botón "Añadir a la Reserva" -> POST /api/reserva/agregar
   const handleAgregar = async (alimentoId) => {
     setError(null);
+    setConfirmacion('');
     setCargando(true);
     try {
       await agregarAReserva(alimentoId, 1);
@@ -63,11 +65,26 @@ function FoodDei() {
       await cargarDatos();
     }
   };
- 
+
+  // Botón "Confirmar reserva" -> POST /api/reserva/confirmar
+  const handleConfirmar = async () => {
+    setError(null);
+    setCargando(true);
+    try {
+      const respuesta = await confirmarReserva();
+      setConfirmacion(`Reserva confirmada. Total pagado: $${respuesta.totalPagado.toFixed(2)}`);
+    } catch (err) {
+      mostrarError(err.message);
+    } finally {
+      await cargarDatos();
+    }
+  };
+
   return (
     <>
       <ErrorAlert error={error} />
       <TopPanel saldo={reserva.saldo} total={reserva.total} />
+      {confirmacion && <Alert color="success">{confirmacion}</Alert>}
  
       {cargando && (
         <div className="text-muted">
@@ -86,6 +103,15 @@ function FoodDei() {
         <Col md="4">
           <Countdown reserva={reserva} onCambio={cargarDatos} onError={mostrarError} />
           <Cart reserva={reserva} menu={menu} onCambio={cargarDatos} onError={mostrarError} />
+          <Button
+            color="success"
+            block
+            className="mt-3"
+            disabled={cargando || reserva.itemsReservados.length === 0}
+            onClick={handleConfirmar}
+          >
+            Confirmar reserva
+          </Button>
         </Col>
       </Row>
     </>
