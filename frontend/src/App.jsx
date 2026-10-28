@@ -3,10 +3,11 @@ import cors from 'cors';
 import guessRoutes from './routes/guess.routes.js';
 import menuRoutes from './routes/menu.routes.js';
 import reservaRoutes from './routes/reserva.routes.js';
+import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173' }));
 app.use(express.json());
 
 // Ruta de prueba para verificar que la API está viva
@@ -21,17 +22,7 @@ app.use('/', guessRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/reserva', reservaRoutes);
 
-// Ruta no encontrada
-app.use((req, res) => {
-  res.status(404).json({ mensaje: 'Ruta no encontrada' });
-});
-
-// Manejo de errores inesperados
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ mensaje: 'Error interno del servidor' });
-});
-
+// Ruta no encontrada y manejo de errores (siempre al final)
 app.use(notFound);
 app.use(errorHandler);
 
