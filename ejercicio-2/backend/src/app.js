@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import menuRoutes from "./routes/menuRoutes.js";
-import reservaRoutes from "./routes/reservaRoutes.js";
+import menuRoutes from "./routes/menu.routes.js";
+import reservaRoutes from "./routes/reserva.routes.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();

@@ -16,13 +16,6 @@ const request = async (ruta, opciones = {}) => {
   return datos;
 };
 
-// Ejercicio 1: Adivina el Número
-export const enviarIntento = (numero) =>
-  request('/guess', { method: 'POST', body: JSON.stringify({ numero }) });
-
-export const reiniciarJuego = () => request('/reset', { method: 'POST' });
-
-// Food DEI
 export const obtenerMenu = () => request('/api/menu');
 
 export const obtenerReserva = () => request('/api/reserva');
@@ -45,3 +38,6 @@ export const eliminarDeReserva = (id) =>
 // Extra (no está en el PDF, pero el backend ya lo tiene): lo usa Countdown.jsx
 // para "Iniciar nueva reserva" cuando la reserva expiró
 export const reiniciarReserva = () => request('/api/reserva/reiniciar', { method: 'POST' });
+
+// Confirma la reserva: el stock queda bloqueado y se descuenta el saldo
+export const confirmarReserva = () => request('/api/reserva/confirmar', { method: 'POST' });
