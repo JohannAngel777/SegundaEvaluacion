@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardBody, Form, Input, Button, Alert, ListGroup, ListGroupItem, Badge } from 'reactstrap';
 import { enviarIntento, reiniciarJuego } from '../services/api.js';
 
@@ -21,6 +21,12 @@ function GuessGame() {
   // Los intentos fallidos son todos los que no fueron correctos
   const intentosFallidos = intentos.filter((intento) => intento.resultado !== 'correcto');
 
+  // Al abrir el juego se pide un número nuevo al servidor,
+  // así el historial vacío coincide con una partida nueva
+  useEffect(() => {
+    reiniciarJuego().catch((err) => setError(err.message));
+  }, []);
+
   const manejarEnvio = (e) => {
     e.preventDefault();
     setError('');
@@ -41,16 +47,18 @@ function GuessGame() {
       .finally(() => setCargando(false));
   };
 
-  const manejarReinicio = () => {
-    reiniciarJuego()
-      .then(() => {
-        setNumero('');
-        setMensaje('');
-        setGano(false);
-        setError('');
-        setIntentos([]);
-      })
-      .catch((err) => setError(err.message));
+  // Aquí la promesa se maneja con async/await en lugar de .then()
+  const manejarReinicio = async () => {
+    try {
+      await reiniciarJuego();
+      setNumero('');
+      setMensaje('');
+      setGano(false);
+      setError('');
+      setIntentos([]);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
