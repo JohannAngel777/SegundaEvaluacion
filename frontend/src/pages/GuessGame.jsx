@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Card, CardBody, Form, Input, Button, Alert } from 'reactstrap';
-import { enviarIntento } from '../services/api.js';
+import { Card, CardBody, Form, Input, Button, Alert, ListGroup, ListGroupItem, Badge } from 'reactstrap';
+import { enviarIntento, reiniciarJuego } from '../services/api.js';
 
 // Textos que se muestran según lo que responde el servidor
 const MENSAJES = {
@@ -15,15 +15,23 @@ function GuessGame() {
   const [gano, setGano] = useState(false);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
+  // Historial de la partida: [{ numero: 50, resultado: 'menor' }]
+  const [intentos, setIntentos] = useState([]);
+
+  // Los intentos fallidos son todos los que no fueron correctos
+  const intentosFallidos = intentos.filter((intento) => intento.resultado !== 'correcto');
 
   const manejarEnvio = (e) => {
     e.preventDefault();
     setError('');
     setCargando(true);
 
-    enviarIntento(Number(numero))
+    const valor = Number(numero);
+
+    enviarIntento(valor)
       .then((datos) => {
         setMensaje(MENSAJES[datos.resultado]);
+        setIntentos([...intentos, { numero: valor, resultado: datos.resultado }]);
         if (datos.resultado === 'correcto') {
           setGano(true);
         }
@@ -31,6 +39,18 @@ function GuessGame() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setCargando(false));
+  };
+
+  const manejarReinicio = () => {
+    reiniciarJuego()
+      .then(() => {
+        setNumero('');
+        setMensaje('');
+        setGano(false);
+        setError('');
+        setIntentos([]);
+      })
+      .catch((err) => setError(err.message));
   };
 
   return (
@@ -57,6 +77,30 @@ function GuessGame() {
 
         {error && <Alert color="warning">{error}</Alert>}
         {mensaje && <Alert color={gano ? 'success' : 'info'}>{mensaje}</Alert>}
+
+        {intentos.length > 0 && (
+          <>
+            <h5>
+              Historial <Badge color="secondary" pill>{intentosFallidos.length} fallidos</Badge>
+            </h5>
+            <ListGroup className="mb-3">
+              {intentos.map((intento, index) => (
+                <ListGroupItem
+                  key={index}
+                  color={intento.resultado === 'correcto' ? 'success' : ''}
+                  className="d-flex justify-content-between"
+                >
+                  <span>Intento {index + 1}: {intento.numero}</span>
+                  <span>{intento.resultado}</span>
+                </ListGroupItem>
+              ))}
+            </ListGroup>
+          </>
+        )}
+
+        <Button color="secondary" outline onClick={manejarReinicio}>
+          Reiniciar juego
+        </Button>
       </CardBody>
     </Card>
   );
