@@ -1,26 +1,35 @@
-// TODO (Persona 1): implementar en la rama feature/backend-food-dei
-// Todos los errores se responden como { mensaje: '...' }
+import * as reservaService from "../state/reserva.js";
+import { HttpError } from "../middleware/errorHandler.js";
 
-// GET /api/reserva
-// Devuelve { saldo, itemsReservados: [{ id, cantidad }], total }
-export const obtenerReserva = (req, res) => {
-  res.status(501).json({ mensaje: 'GET /api/reserva pendiente de implementar' });
+const parseId = (valor) => {
+  const id = Number(valor);
+  if (!Number.isInteger(id)) throw new HttpError(400, "El id de la URL no es válido");
+  return id;
 };
 
-// POST /api/reserva/agregar  body: { alimentoId, cantidad }
-// 400 'Stock insuficiente' si stock < cantidad
-export const agregarItem = (req, res) => {
-  res.status(501).json({ mensaje: 'POST /api/reserva/agregar pendiente de implementar' });
+export const getReserva = (req, res) => {
+  res.status(200).json(reservaService.obtenerReserva());
 };
 
-// PUT /api/reserva/actualizar-porciones/:id  body: { cantidad }
-// 400 'Saldo insuficiente para esta cantidad' si el total supera el saldo
+export const agregar = (req, res) => {
+  const reserva = reservaService.agregarAlimento(req.body ?? {});
+  res.status(201).json(reserva);
+};
+
 export const actualizarPorciones = (req, res) => {
-  res.status(501).json({ mensaje: 'PUT /api/reserva/actualizar-porciones/:id pendiente de implementar' });
+  const reserva = reservaService.actualizarPorciones(parseId(req.params.id), req.body ?? {});
+  res.status(200).json(reserva);
 };
 
-// DELETE /api/reserva/eliminar/:id
-// Quita el platillo de la reserva y devuelve las unidades al stock
-export const eliminarItem = (req, res) => {
-  res.status(501).json({ mensaje: 'DELETE /api/reserva/eliminar/:id pendiente de implementar' });
+export const eliminar = (req, res) => {
+  const reserva = reservaService.eliminarAlimento(parseId(req.params.id));
+  res.status(200).json(reserva);
+};
+
+export const confirmar = (req, res) => {
+  res.status(200).json(reservaService.confirmarReserva());
+};
+
+export const reiniciar = (req, res) => {
+  res.status(200).json(reservaService.reiniciarReserva());
 };
