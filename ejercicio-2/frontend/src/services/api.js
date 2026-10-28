@@ -16,13 +16,6 @@ const request = async (ruta, opciones = {}) => {
   return datos;
 };
 
-// Ejercicio 1: Adivina el Número
-export const enviarIntento = (numero) =>
-  request('/guess', { method: 'POST', body: JSON.stringify({ numero }) });
-
-export const reiniciarJuego = () => request('/reset', { method: 'POST' });
-
-// Food DEI
 export const obtenerMenu = () => request('/api/menu');
 
 export const obtenerReserva = () => request('/api/reserva');
