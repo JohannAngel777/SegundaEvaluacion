@@ -1,8 +1,7 @@
-import { Router } from 'express';
-import { obtenerMenu } from '../controllers/menu.controller.js';
+import { Router } from "express";
+import { getMenu } from "../controllers/menu.controller.js";
 
 const router = Router();
-
-router.get('/', obtenerMenu);
+router.get("/", getMenu);
 
 export default router;
