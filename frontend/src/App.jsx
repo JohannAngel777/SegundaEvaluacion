@@ -1,38 +1,38 @@
-import { useState } from 'react';
-import { Container, Nav, NavItem, NavLink } from 'reactstrap';
-import GuessGame from './pages/GuessGame.jsx';
-import FoodDei from './pages/FoodDei.jsx';
+import express from 'express';
+import cors from 'cors';
+import guessRoutes from './routes/guess.routes.js';
+import menuRoutes from './routes/menu.routes.js';
+import reservaRoutes from './routes/reserva.routes.js';
 
-const PAGINAS = [
-  { id: 'food', titulo: 'Food DEI' },
-  { id: 'guess', titulo: 'Adivina el Número' }
-];
+const app = express();
 
-function App() {
-  const [pagina, setPagina] = useState('food');
+app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
+app.use(express.json());
 
-  return (
-    <Container className="py-4">
-      <Nav tabs className="mb-4">
-        {PAGINAS.map((p) => (
-          <NavItem key={p.id}>
-            <NavLink
-              href="#"
-              active={pagina === p.id}
-              onClick={(e) => {
-                e.preventDefault();
-                setPagina(p.id);
-              }}
-            >
-              {p.titulo}
-            </NavLink>
-          </NavItem>
-        ))}
-      </Nav>
+// Ruta de prueba para verificar que la API está viva
+app.get('/api/health', (req, res) => {
+  res.json({ estado: 'ok' });
+});
 
-      {pagina === 'food' ? <FoodDei /> : <GuessGame />}
-    </Container>
-  );
-}
+// Ejercicio 1: Adivina el Número
+app.use('/', guessRoutes);
 
-export default App;
+// Caso de negocio: Food DEI
+app.use('/api/menu', menuRoutes);
+app.use('/api/reserva', reservaRoutes);
+
+// Ruta no encontrada
+app.use((req, res) => {
+  res.status(404).json({ mensaje: 'Ruta no encontrada' });
+});
+
+// Manejo de errores inesperados
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ mensaje: 'Error interno del servidor' });
+});
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;
