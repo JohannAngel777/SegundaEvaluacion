@@ -1,29 +1,32 @@
-import express from 'express';
-import cors from 'cors';
-import guessRoutes from './routes/guess.routes.js';
-import menuRoutes from './routes/menu.routes.js';
-import reservaRoutes from './routes/reserva.routes.js';
-import { notFound, errorHandler } from './middleware/errorHandler.js';
-
-const app = express();
-
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173' }));
-app.use(express.json());
-
-// Ruta de prueba para verificar que la API está viva
-app.get('/api/health', (req, res) => {
-  res.json({ estado: 'ok' });
-});
-
-// Ejercicio 1: Adivina el Número
-app.use('/', guessRoutes);
-
-// Caso de negocio: Food DEI
-app.use('/api/menu', menuRoutes);
-app.use('/api/reserva', reservaRoutes);
-
-// Ruta no encontrada y manejo de errores (siempre al final)
-app.use(notFound);
-app.use(errorHandler);
-
-export default app;
+import { useState } from 'react';
+import { Container, Nav, NavItem, NavLink } from 'reactstrap';
+import FoodDei from './pages/FoodDei.jsx';
+import GuessGame from './pages/GuessGame.jsx';
+ 
+// Componente raíz: dos pestañas, una por cada problema de la evaluación
+function App() {
+  const [pagina, setPagina] = useState('fooddei');
+ 
+  return (
+    <Container className="py-3">
+      <h1 className="h3 mb-3">Evaluación II - Programación Web</h1>
+ 
+      <Nav tabs className="mb-3">
+        <NavItem>
+          <NavLink href="#" active={pagina === 'fooddei'} onClick={() => setPagina('fooddei')}>
+            Food DEI
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink href="#" active={pagina === 'guess'} onClick={() => setPagina('guess')}>
+            Adivina el Número
+          </NavLink>
+        </NavItem>
+      </Nav>
+ 
+      {pagina === 'fooddei' ? <FoodDei /> : <GuessGame />}
+    </Container>
+  );
+}
+ 
+export default App;

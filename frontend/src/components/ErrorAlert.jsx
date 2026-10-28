@@ -1,8 +1,19 @@
-// TODO (Persona 2): mostrar el mensaje de error del backend con
-// <UncontrolledAlert color="warning"> en la parte superior
+import { UncontrolledAlert } from 'reactstrap';
 
-function ErrorAlert() {
-  return null;
+
+// Muestra el mensaje de error del backend en la parte superior.
+// Props:
+// - error: null o { id, texto }  (el id cambia en cada error nuevo)
+function ErrorAlert({ error }) {
+  if (!error) return null;
+
+  // key={error.id}: si llega otro error (aunque tenga el mismo texto), React crea
+  // la alerta de nuevo. Así reaparece aunque el usuario ya hubiera cerrado la anterior.
+  return (
+    <UncontrolledAlert color="warning" key={error.id}>
+      {error.texto}
+    </UncontrolledAlert>
+  );
 }
 
 export default ErrorAlert;
