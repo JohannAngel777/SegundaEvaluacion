@@ -41,3 +41,7 @@ export const actualizarPorciones = (id, cantidad) =>
 
 export const eliminarDeReserva = (id) =>
   request(`/api/reserva/eliminar/${id}`, { method: 'DELETE' });
+
+// Extra (no está en el PDF, pero el backend ya lo tiene): lo usa Countdown.jsx
+// para "Iniciar nueva reserva" cuando la reserva expiró
+export const reiniciarReserva = () => request('/api/reserva/reiniciar', { method: 'POST' });
